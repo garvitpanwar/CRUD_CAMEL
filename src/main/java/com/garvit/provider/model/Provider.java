@@ -64,10 +64,10 @@
 //        this.sla = sla;
 //    }
 //}
-
 package com.garvit.provider.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "provider")
@@ -90,9 +90,12 @@ public class Provider {
     @Column(name = "supported_channels", columnDefinition = "text[]")
     private String[] supportedChannels;
 
-    // One-to-one relationship with SLA table
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    // FIXED: Changed cascade and fetch strategy
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            fetch = FetchType.EAGER,
+            orphanRemoval = true)
     @JoinColumn(name = "sla_id", referencedColumnName = "id")
+    @JsonIgnore
     private SLA sla;
 
     // --- Getters & Setters ---
@@ -145,4 +148,3 @@ public class Provider {
         this.sla = sla;
     }
 }
-

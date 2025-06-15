@@ -25,7 +25,6 @@
 
 
 package com.garvit.provider.dto;
-
 public class SLADTO {
     private Long id;  // Optional, useful if updating SLA later
     private long deliveryTimeMs;
