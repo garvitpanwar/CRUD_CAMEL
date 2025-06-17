@@ -91,13 +91,11 @@ public class Provider {
     private String[] supportedChannels;
 
     // FIXED: Changed cascade and fetch strategy
-    // Provider.java entity mein ye changes karo
-    @OneToOne(
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH},
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
-    )
-    @JoinColumn(name = "sla_id")
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            fetch = FetchType.EAGER,
+            orphanRemoval = true)
+    @JoinColumn(name = "sla_id", referencedColumnName = "id")
+    @JsonIgnore
     private SLA sla;
 
     // --- Getters & Setters ---

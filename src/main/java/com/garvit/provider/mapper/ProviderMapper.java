@@ -4,7 +4,9 @@ import com.garvit.provider.dto.ProviderDTO;
 import com.garvit.provider.dto.SLADTO;
 import com.garvit.provider.model.Provider;
 import com.garvit.provider.model.SLA;
+import jakarta.enterprise.context.ApplicationScoped;
 
+@ApplicationScoped
 public class ProviderMapper {
 
     public static ProviderDTO toDto(Provider provider) {
