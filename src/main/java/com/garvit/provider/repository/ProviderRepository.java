@@ -116,6 +116,11 @@ public class ProviderRepository implements PanacheRepository<Provider> {
     }
 
     @Transactional
+    public Provider findByPartnerIdWithTransaction(String partnerId) {
+        return find("partnerId", partnerId).firstResult();
+    }
+
+    @Transactional
     public boolean deleteProviderById(Long id) {
         Provider provider = findById(id);
         if (provider != null) {

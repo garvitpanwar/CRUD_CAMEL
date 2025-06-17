@@ -787,9 +787,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import com.garvit.provider.service.ProviderService;
+import com.garvit.provider.dto.ProviderDTO;
+import com.garvit.provider.model.Provider;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+
+
+import com.garvit.provider.dto.ProviderDTO;
+import com.garvit.provider.dto.ResponseMessage;
+import com.garvit.provider.model.Provider;
+import com.garvit.provider.service.ProviderService;
+import org.apache.camel.Exchange;
+
 
 @ApplicationScoped
 public class ProviderRoute extends RouteBuilder {
@@ -799,6 +811,9 @@ public class ProviderRoute extends RouteBuilder {
 
     @Inject
     ProviderRepository providerRepository;
+
+    @Inject
+    ProviderService providerService;
 
     @Inject
     LogHelper logHelper;
@@ -854,60 +869,31 @@ public class ProviderRoute extends RouteBuilder {
                 .process(cleanupLogging());
 
         // Update Provider - Proper Camel Way
+        // ProviderRoute.java mein update karo
         from("direct:updateProviderDirect")
                 .routeId("updateProviderDirect")
                 .process(initializeLogging())
                 .process(logRequestReceived("PUT /provider/update/{id}"))
                 .process(exchange -> {
-                    Long id = exchange.getIn().getHeader("id", Long.class);
-                    logInfo("Processing update request for provider ID: " + id);
+                    String idParam = exchange.getIn().getHeader("id", String.class);
+                    try {
+                        Long id = Long.parseLong(idParam);
+                        exchange.getIn().setHeader("providerId", id);
+                    } catch (NumberFormatException e) {
+                        exchange.getMessage().setBody(new ResponseMessage("Invalid provider ID format"));
+                        exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 400);
+                        log.error("Invalid ID format: " + idParam, e);
+                    }
                 })
-                .process(logRequestSentToService("ProviderRepository.findProviderById"))
-                .process(exchange -> {
-                    Long id = exchange.getIn().getHeader("id", Long.class);
-                    Provider existing = providerRepository.findProviderById(id);
-                    exchange.getMessage().setBody(existing);
-                    exchange.getIn().setHeader("existingProvider", existing);
-                })
-                .process(logResponseReceivedFromService("ProviderRepository.findProviderById"))
                 .choice()
-                .when(body().isNull())
+                .when(header(Exchange.HTTP_RESPONSE_CODE).isNull())
+                .bean(providerService, "updateProvider(${header.providerId}, ${body})")
                 .process(exchange -> {
-                    Long id = exchange.getIn().getHeader("id", Long.class);
-                    exchange.getMessage().setBody(new ResponseMessage("Provider not found"));
-                    exchange.getMessage().setHeader(Exchange.HTTP_RESPONSE_CODE, 404);
-                    logInfo("Provider not found for update, ID: " + id);
+                    ProviderDTO result = exchange.getIn().getBody(ProviderDTO.class);
+                    exchange.getMessage().setBody(result);
                 })
-                .otherwise()
-                .process(exchange -> {
-                    Provider existing = exchange.getIn().getHeader("existingProvider", Provider.class);
-                    ProviderDTO dto = exchange.getMessage().getBody(ProviderDTO.class);
-
-                    // Update fields
-                    existing.setPartnerId(dto.getPartnerId());
-                    existing.setName(dto.getName());
-                    existing.setContactInfo(dto.getContactInfo());
-                    existing.setSupportedChannels(dto.getSupportedChannels());
-
-                    SLA sla = new SLA();
-                    sla.setDeliveryTimeMs(dto.getSla().getDeliveryTimeMs());
-                    sla.setUptimePercent(dto.getSla().getUptimePercent());
-                    existing.setSla(sla);
-
-                    exchange.getMessage().setBody(existing);
-                })
-                .process(logRequestSentToService("ProviderRepository.updateProvider"))
-                .process(exchange -> {
-                    Provider provider = exchange.getMessage().getBody(Provider.class);
-                    providerRepository.updateProvider(provider);
-
-                    Long id = exchange.getIn().getHeader("id", Long.class);
-                    logInfo("Provider updated successfully, ID: " + id);
-                    exchange.getMessage().setBody(new ResponseMessage("Provider updated successfully"));
-                })
-                .process(logResponseReceivedFromService("ProviderRepository.updateProvider"))
+                .process(logResponseSentToUser("Provider updated successfully"))
                 .end()
-                .process(logResponseSentToUser("Provider update operation completed"))
                 .process(cleanupLogging());
 
         // Delete Provider - Proper Camel Way

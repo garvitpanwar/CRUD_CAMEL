@@ -1,51 +1,53 @@
-//package com.garvit.provider.mapper;
-//
-//import com.garvit.provider.dto.ProviderDTO;
-//import com.garvit.provider.model.Provider;
-//import com.garvit.provider.model.SLA;
-//
-//public class ProviderMapper {
-//    public static Provider toEntity(ProviderDTO dto) {
-//        Provider p = new Provider();
-//        p.setPartnerId(dto.getPartnerId());
-//        p.setName(dto.getName());
-//        p.setContactInfo(dto.getContactInfo());
-//        p.setSupportedChannels(dto.getSupportedChannels());
-//
-//        SLA sla = new SLA();
-//        sla.setDeliveryTimeMs(dto.getSla().getDeliveryTimeMs());
-//        sla.setUptimePercent(dto.getSla().getUptimePercent());
-//
-//        p.setSla(sla);
-//        return p;
-//    }
-//}
-
-
 package com.garvit.provider.mapper;
 
 import com.garvit.provider.dto.ProviderDTO;
+import com.garvit.provider.dto.SLADTO;
 import com.garvit.provider.model.Provider;
 import com.garvit.provider.model.SLA;
 
 public class ProviderMapper {
+
+    public static ProviderDTO toDto(Provider provider) {
+        if (provider == null) {
+            return null;
+        }
+
+        ProviderDTO dto = new ProviderDTO();
+        dto.setPartnerId(provider.getPartnerId());
+        dto.setName(provider.getName());
+        dto.setContactInfo(provider.getContactInfo());
+        dto.setSupportedChannels(provider.getSupportedChannels());
+
+        // Handle SLA mapping
+        if (provider.getSla() != null) {
+            SLADTO slaDto = new SLADTO();
+            slaDto.setDeliveryTimeMs(provider.getSla().getDeliveryTimeMs());
+            slaDto.setUptimePercent(provider.getSla().getUptimePercent());
+            dto.setSla(slaDto);
+        }
+
+        return dto;
+    }
+
     public static Provider toEntity(ProviderDTO dto) {
-        // Convert SLADTO to SLA entity
-        SLA sla = new SLA();
-        sla.setDeliveryTimeMs(dto.getSla().getDeliveryTimeMs());
-        sla.setUptimePercent(dto.getSla().getUptimePercent());
+        if (dto == null) {
+            return null;
+        }
 
-        // Convert ProviderDTO to Provider entity
-        Provider p = new Provider();
-        p.setPartnerId(dto.getPartnerId());
-        p.setName(dto.getName());
-        p.setContactInfo(dto.getContactInfo());
-        p.setSupportedChannels(dto.getSupportedChannels()); //
+        Provider provider = new Provider();
+        provider.setPartnerId(dto.getPartnerId());
+        provider.setName(dto.getName());
+        provider.setContactInfo(dto.getContactInfo());
+        provider.setSupportedChannels(dto.getSupportedChannels());
 
-        p.setSla(sla);
+        // Handle SLA mapping
+        if (dto.getSla() != null) {
+            SLA sla = new SLA();
+            sla.setDeliveryTimeMs(dto.getSla().getDeliveryTimeMs());
+            sla.setUptimePercent(dto.getSla().getUptimePercent());
+            provider.setSla(sla);
+        }
 
-        return p;
+        return provider;
     }
 }
-
-

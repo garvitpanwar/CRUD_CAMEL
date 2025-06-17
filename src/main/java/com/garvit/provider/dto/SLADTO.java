@@ -25,7 +25,11 @@
 
 
 package com.garvit.provider.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class SLADTO {
+    @JsonIgnore
     private Long id;  // Optional, useful if updating SLA later
     private long deliveryTimeMs;
     private double uptimePercent;
