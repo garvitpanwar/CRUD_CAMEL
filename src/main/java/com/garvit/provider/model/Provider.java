@@ -71,6 +71,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "provider")
+@Column(name = "partner_id", nullable = false, unique = true)
+private String partnerId;
+
 public class Provider {
 
     @Id
