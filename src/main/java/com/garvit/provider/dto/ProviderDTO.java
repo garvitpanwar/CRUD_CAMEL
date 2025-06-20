@@ -125,6 +125,7 @@ public class ProviderDTO {
     @Pattern(regexp = "^[A-Za-z0-9]+$", message = "Partner ID must be alphanumeric")
     private String partnerId;
 
+
     @NotBlank(message = "Provider name cannot be blank")
     @Size(min = 2, max = 100, message = "Provider name must be between 2-100 characters")
     private String name;

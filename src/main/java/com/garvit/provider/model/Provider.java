@@ -64,6 +64,94 @@
 //        this.sla = sla;
 //    }
 //}
+//package com.garvit.provider.model;
+//
+//import jakarta.persistence.*;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+//
+//@Entity
+//@Table(name = "provider")
+//@Column(name = "partner_id", nullable = false, unique = true)
+//private String partnerId;
+//
+//public class Provider {
+//
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//
+//    @Column(name = "partner_id", nullable = false)
+//    private String partnerId;
+//
+//    @Column(nullable = false)
+//    private String name;
+//
+//    @Column(name = "contact_info")
+//    private String contactInfo;
+//
+//    // PostgreSQL-specific: store array of strings as text[]
+//    @Column(name = "supported_channels", columnDefinition = "text[]")
+//    private String[] supportedChannels;
+//
+//    // FIXED: Changed cascade and fetch strategy
+//    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+//            fetch = FetchType.EAGER,
+//            orphanRemoval = true)
+//    @JoinColumn(name = "sla_id", referencedColumnName = "id")
+//    @JsonIgnore
+//    private SLA sla;
+//
+//    // --- Getters & Setters ---
+//
+//    public Long getId() {
+//        return id;
+//    }
+//
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
+//
+//    public String getPartnerId() {
+//        return partnerId;
+//    }
+//
+//    public void setPartnerId(String partnerId) {
+//        this.partnerId = partnerId;
+//    }
+//
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+//
+//    public String getContactInfo() {
+//        return contactInfo;
+//    }
+//
+//    public void setContactInfo(String contactInfo) {
+//        this.contactInfo = contactInfo;
+//    }
+//
+//    public String[] getSupportedChannels() {
+//        return supportedChannels;
+//    }
+//
+//    public void setSupportedChannels(String[] supportedChannels) {
+//        this.supportedChannels = supportedChannels;
+//    }
+//
+//    public SLA getSla() {
+//        return sla;
+//    }
+//
+//    public void setSla(SLA sla) {
+//        this.sla = sla;
+//    }
+//}
+
 package com.garvit.provider.model;
 
 import jakarta.persistence.*;
@@ -71,16 +159,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "provider")
-@Column(name = "partner_id", nullable = false, unique = true)
-private String partnerId;
-
 public class Provider {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "partner_id", nullable = false)
+    @Column(name = "partner_id", nullable = false, unique = true)
     private String partnerId;
 
     @Column(nullable = false)
